@@ -25,7 +25,7 @@
       },
       "AUTO_LEAVING_ASSISTANT": {
         "description": "If you want your assistant to leave all chats automatically after some time.",
-        "value": "False",
+        "value": "True",
         "required": true
       },
       "BOT_TOKEN": {

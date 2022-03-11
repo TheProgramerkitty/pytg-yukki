@@ -9,6 +9,7 @@
 
 
 import config
+from config import PRIVATE_BOT_MODE
 from YukkiMusic.core.mongo import mongodb
 
 channeldb = mongodb.cplaymode
@@ -136,7 +137,15 @@ async def set_playmode(chat_id: int, mode: str):
 
 # language
 async def get_lang(chat_id: int) -> str:
-    return "en"
+    mode = langm.get(chat_id)
+    if not mode:
+        lang = await langdb.find_one({"chat_id": chat_id})
+        if not lang:
+            langm[chat_id] = "en"
+            return "en"
+        langm[chat_id] = lang["lang"]
+        return lang["lang"]
+    return mode
 
 
 async def set_lang(chat_id: int, lang: str):
@@ -359,7 +368,10 @@ async def get_aud_bit_name(chat_id: int) -> str:
 async def get_vid_bit_name(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
-        return "Medium"
+        if PRIVATE_BOT_MODE == str(True):
+            return "High"
+        else:
+            return "Medium"
     return mode
 
 
@@ -378,7 +390,10 @@ async def get_audio_bitrate(chat_id: int) -> str:
 async def get_video_bitrate(chat_id: int) -> str:
     mode = video.get(chat_id)
     if not mode:
-        return MediumQualityVideo()
+        if PRIVATE_BOT_MODE == str(True):
+            return HighQualityVideo()
+        else:
+            return MediumQualityVideo()
     if str(mode) == "High":
         return HighQualityVideo()
     elif str(mode) == "Medium":

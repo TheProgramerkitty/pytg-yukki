@@ -20,6 +20,7 @@ from strings import get_command
 from YukkiMusic import (Apple, Resso, SoundCloud, Spotify, Telegram,
                         YouTube, app)
 from YukkiMusic.utils import seconds_to_min, time_to_seconds
+from YukkiMusic.utils.channelplay import get_channeplayCB
 from YukkiMusic.utils.database import (get_chatmode, get_cmode,
                                        is_video_allowed)
 from YukkiMusic.utils.decorators.language import languageCB
@@ -59,6 +60,7 @@ async def play_commnd(
     plist_id = None
     slider = None
     plist_type = None
+    spotify = None
     user_id = message.from_user.id
     user_name = message.from_user.first_name
     audio_telegram = (
@@ -177,11 +179,15 @@ async def play_commnd(
                         config.PLAYLIST_FETCH_LIMIT,
                         message.from_user.id,
                     )
-                except Exception:
+                except Exception as e:
+                    print(e)
                     return await mystic.edit_text(_["play_3"])
                 streamtype = "playlist"
                 plist_type = "yt"
-                plist_id = url.split("=")[1]
+                if "&" in url:
+                    plist_id = (url.split("=")[1]).split("&")[0]
+                else:
+                    plist_id = url.split("=")[1]
                 img = config.PLAYLIST_IMG_URL
                 cap = _["play_10"]
             else:
@@ -196,6 +202,7 @@ async def play_commnd(
                     details["duration_min"],
                 )
         elif await Spotify.valid(url):
+            spotify = True
             if (
                 not config.SPOTIFY_CLIENT_ID
                 and not config.SPOTIFY_CLIENT_SECRET
@@ -348,7 +355,11 @@ async def play_commnd(
                     )
             else:
                 buttons = livestream_markup(
-                    _, track_id, user_id, "v" if video else "a"
+                    _,
+                    track_id,
+                    user_id,
+                    "v" if video else "a",
+                    "c" if channel else "g",
                 )
                 return await mystic.edit_text(
                     _["play_15"],
@@ -365,6 +376,7 @@ async def play_commnd(
                 message.chat.id,
                 video=video,
                 streamtype=streamtype,
+                spotify=spotify,
             )
         except Exception as e:
             ex_type = type(e).__name__
@@ -385,7 +397,11 @@ async def play_commnd(
             )
             lyrical[ran_hash] = plist_id
             buttons = playlist_markup(
-                _, ran_hash, message.from_user.id, plist_type
+                _,
+                ran_hash,
+                message.from_user.id,
+                plist_type,
+                "c" if channel else "g",
             )
             await mystic.delete()
             await message.reply_photo(
@@ -399,7 +415,12 @@ async def play_commnd(
         else:
             if slider:
                 buttons = slider_markup(
-                    _, track_id, message.from_user.id, query, 0
+                    _,
+                    track_id,
+                    message.from_user.id,
+                    query,
+                    0,
+                    "c" if channel else "g",
                 )
                 await mystic.delete()
                 await message.reply_photo(
@@ -415,7 +436,10 @@ async def play_commnd(
                 )
             else:
                 buttons = track_markup(
-                    _, track_id, message.from_user.id
+                    _,
+                    track_id,
+                    message.from_user.id,
+                    "c" if channel else "g",
                 )
                 await mystic.delete()
                 await message.reply_photo(
@@ -433,7 +457,7 @@ async def play_commnd(
 async def play_music(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
-    vidid, user_id, mode = callback_request.split("|")
+    vidid, user_id, mode, cplay = callback_request.split("|")
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(
@@ -441,22 +465,12 @@ async def play_music(client, CallbackQuery, _):
             )
         except:
             return
-    chatmode = await get_chatmode(CallbackQuery.message.chat.id)
-    if chatmode == "Group":
-        chat_id = CallbackQuery.message.chat.id
-        channel = None
-    else:
-        chat_id = await get_cmode(CallbackQuery.message.chat.id)
-        try:
-            chat = await app.get_chat(chat_id)
-            channel = chat.title
-        except:
-            try:
-                return await CallbackQuery.answer(
-                    _["cplay_4"], show_alert=True
-                )
-            except:
-                return
+    try:
+        chat_id, channel = await get_channeplayCB(
+            _, cplay, CallbackQuery
+        )
+    except:
+        return
     user_name = CallbackQuery.from_user.first_name
     try:
         await CallbackQuery.message.delete()
@@ -480,7 +494,11 @@ async def play_music(client, CallbackQuery, _):
             )
     else:
         buttons = livestream_markup(
-            _, track_id, CallbackQuery.from_user.id, mode
+            _,
+            track_id,
+            CallbackQuery.from_user.id,
+            mode,
+            "c" if cplay == "c" else "g",
         )
         return await mystic.edit_text(
             _["play_15"],
@@ -530,7 +548,7 @@ async def anonymous_check(client, CallbackQuery):
 async def play_playlists_command(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
-    videoid, user_id, ptype, mode = callback_request.split("|")
+    videoid, user_id, ptype, mode, cplay = callback_request.split("|")
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(
@@ -538,22 +556,12 @@ async def play_playlists_command(client, CallbackQuery, _):
             )
         except:
             return
-    chatmode = await get_chatmode(CallbackQuery.message.chat.id)
-    if chatmode == "Group":
-        chat_id = CallbackQuery.message.chat.id
-        channel = None
-    else:
-        chat_id = await get_cmode(CallbackQuery.message.chat.id)
-        try:
-            chat = await app.get_chat(chat_id)
-            channel = chat.title
-        except:
-            try:
-                return await CallbackQuery.answer(
-                    _["cplay_4"], show_alert=True
-                )
-            except:
-                return
+    try:
+        chat_id, channel = await get_channeplayCB(
+            _, cplay, CallbackQuery
+        )
+    except:
+        return
     user_name = CallbackQuery.from_user.first_name
     await CallbackQuery.message.delete()
     try:
@@ -565,7 +573,7 @@ async def play_playlists_command(client, CallbackQuery, _):
     )
     videoid = lyrical.get(videoid)
     video = True if mode == "v" else None
-    spotify = None
+    spotify = False
     if ptype == "yt":
         try:
             result = await YouTube.playlist(
@@ -577,16 +585,19 @@ async def play_playlists_command(client, CallbackQuery, _):
         except Exception:
             return await mystic.edit_text(_["play_3"])
     if ptype == "spplay":
+        spotify = True
         try:
             result, spotify_id = await Spotify.playlist(videoid)
         except Exception:
             return await mystic.edit_text(_["play_3"])
     if ptype == "spalbum":
+        spotify = True
         try:
             result, spotify_id = await Spotify.album(videoid)
         except Exception:
             return await mystic.edit_text(_["play_3"])
     if ptype == "spartist":
+        spotify = True
         try:
             result, spotify_id = await Spotify.artist(videoid)
         except Exception:
@@ -607,6 +618,7 @@ async def play_playlists_command(client, CallbackQuery, _):
             CallbackQuery.message.chat.id,
             video,
             streamtype="playlist",
+            spotify=spotify,
         )
     except Exception as e:
         ex_type = type(e).__name__
@@ -624,7 +636,7 @@ async def play_playlists_command(client, CallbackQuery, _):
 async def slider_queries(client, CallbackQuery, _):
     callback_data = CallbackQuery.data.strip()
     callback_request = callback_data.split(None, 1)[1]
-    what, rtype, query, user_id = callback_request.split("|")
+    what, rtype, query, user_id, cplay = callback_request.split("|")
     if CallbackQuery.from_user.id != int(user_id):
         try:
             return await CallbackQuery.answer(
@@ -646,7 +658,9 @@ async def slider_queries(client, CallbackQuery, _):
         title, duration_min, thumbnail, vidid = await YouTube.slider(
             query, query_type
         )
-        buttons = slider_markup(_, vidid, user_id, query, query_type)
+        buttons = slider_markup(
+            _, vidid, user_id, query, query_type, cplay
+        )
         med = InputMediaPhoto(
             media=thumbnail,
             caption=_["play_11"].format(
@@ -669,7 +683,9 @@ async def slider_queries(client, CallbackQuery, _):
         title, duration_min, thumbnail, vidid = await YouTube.slider(
             query, query_type
         )
-        buttons = slider_markup(_, vidid, user_id, query, query_type)
+        buttons = slider_markup(
+            _, vidid, user_id, query, query_type, cplay
+        )
         med = InputMediaPhoto(
             media=thumbnail,
             caption=_["play_11"].format(
