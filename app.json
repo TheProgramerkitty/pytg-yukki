@@ -22,21 +22,16 @@
         "description": "Get this value from https://my.telegram.org",
         "value": "",
         "required": true
-      },
-      "AUTO_LEAVING_ASSISTANT": {
-        "description": "If you want your assistant to leave all chats automatically after some time.",
-        "value": "True",
-        "required": true
-      },
+      },      
       "BOT_TOKEN": {
         "description": "A Bot's token from Botfather",
         "value": "",
         "required": true
       },
       "MONGO_DB_URI": {
-        "description": "Mongo DB URL",
+        "description": "Get a mongodb url from https://cloud.mongodb.com . You can leave it blank if you want , bot will use Yukki's database for you.",
         "value": "",
-        "required": true
+        "required": false
       },
       "MUSIC_BOT_NAME": {
         "description": "A name for your Music Bot. Please don't use ascii characters",
@@ -67,21 +62,11 @@
         "description": "Your Log Group ID, add your bot and promote as an admin with full rights!. Use only Group. Please don't use Channel ID.",
         "value": "",
         "required": true
-      },
-      "UPSTREAM_REPO": {
-        "description": "If you dont know this, Leave as it is",
-        "value": "https://github.com/TechShreyash/SiestaXMusic",
-        "required": true
-      },
-      "UPSTREAM_BRANCH": {
-        "description": "Repo's Branch Name",
-        "value": "main",
-        "required": true
-      },
+      },      
       "START_IMG_URL": {
         "description": "Telegraph Image URL For Start Command",
         "value": "https://telegra.ph/file/e17f42bc195635b668d6d.jpg",
-        "required": true
+        "required": false
       }
     },
     "buildpacks": [
