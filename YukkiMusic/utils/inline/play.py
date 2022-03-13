@@ -80,7 +80,7 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
         ],
         [
             InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"],
+                text="🗑 Close",
                 callback_data=f"forceclose {videoid}|{user_id}",
             ),
         ],
