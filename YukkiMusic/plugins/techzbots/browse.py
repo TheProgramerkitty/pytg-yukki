@@ -13,12 +13,38 @@ import config
 
 uname = app.username
 from config import BANNED_USERS, lyrical
+
 @app.on_message(
     filters.command(["browse",f"browse@{uname}"])
     & filters.group
     & ~filters.edited
     & ~BANNED_USERS
 )
+async def browse_menu(_, message):
+    try:
+        query = await message.reply_text("🔍**Searching...**")
+        data = query.data.replace("cat","").strip()
+        buttons = getsp_categories()        
+        if data == "pg1":
+            return await query.edit("**⭐️ Select the Category from which you want to listen songs !!!**",reply_markup=InlineKeyboardMarkup(buttons[0]))
+        elif data == "pg2":
+            return await query.edit("**⭐️ Select the Category from which you want to listen songs !!!**",reply_markup=InlineKeyboardMarkup(buttons[1]))
+        elif data == "pg3":
+            return await query.edit("**⭐️ Select the Category from which you want to listen songs !!!**",reply_markup=InlineKeyboardMarkup(buttons[2]))
+
+        category_pl_buttons = getsp_categories_info(data)
+        category_pl_buttons.append([
+                InlineKeyboardButton(
+                    text="↪️ Refresh", callback_data=f"refbrowse {data}"
+                ),
+                InlineKeyboardButton(
+                    text="↪️ Back", callback_data="cat pg1"
+                ),            
+            ],)
+        return await query.edit("**⭐️ Now Select the playlist you want to listen from your choosed category !!!**",reply_markup=InlineKeyboardMarkup(category_pl_buttons))
+    except:
+        pass
+
 @app.on_callback_query(filters.regex("cat"))
 async def browse_menu(_, query):
     try:
