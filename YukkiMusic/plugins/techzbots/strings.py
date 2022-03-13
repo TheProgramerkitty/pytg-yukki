@@ -24,7 +24,7 @@ START_BUTTON_GROUP = InlineKeyboardMarkup(
                 text="📚 Commands", callback_data="command_menu"
             ),
             InlineKeyboardButton(
-                text="🔧 Settings", callback_data="settingm"
+                text="🔧 Settings", callback_data="settings_helper"
             ),                                   
         ],
         [
@@ -152,7 +152,7 @@ SUDO_BACK_BUTTON = InlineKeyboardMarkup(
 
 
 ADMIN_TEXT = f"""
-✅__**Admin Commands:**__
+✅--**Admin Commands:**--
 
 c stands for channel play.
 
@@ -164,17 +164,17 @@ c stands for channel play.
 /stop or /cstop- Stop the playing music.
 /shuffle or /cshuffle- Randomly shuffles the queued playlist.
 
-✅__**Specific Skip:**__
+✅--**Specific Skip:**--
 /skip or /cskip [Number(example: 3)] 
     - Skips music to a the specified queued number. Example: /skip 3 will skip music to third queued music and will ignore 1 and 2 music in queue.
 
-✅__**Loop Play:**__
+✅--**Loop Play:**--
 /loop or /cloop [enable/disable] or [Numbers between 1-10] 
     - When activated, bot loops the current playing music to 1-10 times on voice chat. Default to 10 times.
 
 """
 AUTH_TEXT = """
-✅__**Auth Users:**__
+✅--**Auth Users:**--
 Auth Users can use admin commands without admin rights in your chat.
 
 /auth [Username] - Add a user to AUTH LIST of the group.
@@ -195,7 +195,7 @@ AUTH_BACK_BUTTON = InlineKeyboardMarkup(
 )
 
 BOT_TEXT = """
-✅__**Bot Commands:**__
+✅--**Bot Commands:**--
 
 /stats - Get Top 10 Tracks Global Stats, Top 10 Users of bot, Top 10 Chats on bot, Top 10 Played in a chat etc etc.
 
@@ -210,7 +210,7 @@ c stands for channel play.
 """
 
 PLAY_TEXT = """
-✅__**Play Commands:**__
+✅--**Play Commands:**--
 
 Available Commands = play , vplay , cplay
 
@@ -227,7 +227,7 @@ force stands for force play.
 /channelplay [Chat username or id] or [Disable] - Connect channel to a group and stream music on channel's voice chat from your group.
 
 
-✅__**Bot's Server Playlists:**__
+✅--**Bot's Server Playlists:**--
 /playlist  - Check Your Saved Playlist On Servers.
 /deleteplaylist - Delete any saved music in your playlist
 /play  - Start playing Your Saved Playlist from Servers.
@@ -237,19 +237,19 @@ force stands for force play.
 BASIC_TEXT = """
 💠 **Basic Commands:**
 
-/start - start the bot
-/help - get help message
-/play - play songs or videos in vc
-/mplay - play songs directly in vc
-/vplay - play videos directly in vc
-/spotify - play songs from spotify
-/resso - play songs from resso
-/lyrics - get lyrics of song
-/ping - ping the bot
-/playlist - play your playlist
-/song - download a song as music or video
-/settings - settings of the group
-/queue - get queued song
+/start - Start the bot
+
+/help - Get help message
+
+/play - Play songs or videos in vc
+
+/vplay - Play video in VC
+
+/settings - Check Settings of bot in your group
+
+**Some Useful Commands :** 
+
+/pause /resume /skip /end /loop /shuffle
 """
 
 BASIC_BACK_BUTTON = InlineKeyboardMarkup(
