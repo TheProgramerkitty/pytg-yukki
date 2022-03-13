@@ -24,7 +24,7 @@ START_BUTTON_GROUP = InlineKeyboardMarkup(
                 text="📚 Commands", callback_data="command_menu"
             ),
             InlineKeyboardButton(
-                text="🔧 Settings", callback_data="settings_helper"
+                text="⚙️ Settings", callback_data="settings_helper"
             ),                                   
         ],
         [
